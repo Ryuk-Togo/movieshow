@@ -28,4 +28,5 @@ sample/webscrayping/dogimg/*
 sample/webscrayping/xkcd/*
 initial_sql/*
 # settings.py
-static/moviefile/*
+static/moviefile/*.mp4
+static/moviefile/*.mov
