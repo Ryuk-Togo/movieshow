@@ -1,0 +1,96 @@
+{% extends "movie/base.html" %}
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'movie/css/main.css' %}" >
+<script src="{% static 'movie/js/main.js' %}" ></script>
+<script>
+    window.onload = function(){
+        var max = document.getElementById('total').value;
+        var movieTr = document.getElementsByClassName('movie-table-class');
+        var movieObj = document.getElementsByClassName('movie-file-class');
+        
+        // 動画ファイルのロードが完了した件数
+        var movieLoadedDataCnt = 0;
+        // 再生中の動画番号
+        var moviePlayingDataRow = 0;
+        console.log(max);
+
+        for(let i=0; i<max; i++) {
+            console.log(i);
+
+            // 読み込み完了イベント
+            movieObj[i].addEventListener('loadeddata', function() {
+                movieLoadedDataCnt++;
+                if (movieLoadedDataCnt==max) {
+                    movieTr[moviePlayingDataRow].style.display = "block";
+                    movieObj[moviePlayingDataRow].play();
+                    console.log('再生準備完了');
+                }
+            });
+
+            movieObj[i].addEventListener('play', function() {
+                console.log('再生開始');
+            });
+
+            movieObj[i].addEventListener('playing', function() {
+                this.muted = false;
+                // movieObj[moviePlayingDataRow].muted = false;
+                console.log('再生中');
+            });
+
+            movieObj[i].addEventListener('ended', function() {
+                movieTr[moviePlayingDataRow].style.display = "none";
+                moviePlayingDataRow++;
+                console.log('再生が完了しました');
+
+                if (moviePlayingDataRow<max) {
+                    movieTr[moviePlayingDataRow].style.display = "block";
+                } else {
+                    // 全動画を見おわっったら、１から再生
+                    for (let j=0; j<max; j++) {
+                        movieTr[j].style.display = "block";
+                        moviePlayingDataRow = 0;
+                    }
+                }
+
+                movieObj[moviePlayingDataRow].play();
+            });
+
+
+        }
+    }
+</script>
+{% endblock %}
+
+{% block body %}
+<header>
+    <input type="hidden" id="total" value="{{total}}"/>
+</header>
+<div id="content">
+    <div id="movie_view">
+    </div>
+    <div id="movie_info">
+        <div>
+            <table>
+                {% for movie in movies %}
+                <tr id="movie-table" class="movie-table-class" >
+            <!-- <tr id="movie-table" name="movie-table"> -->
+                    <td style="width:80%;">
+                        <video id="movie-file" class="movie-file-class" width="100%" controls src="{{movie.file_path.value}}" muted></video>
+                    </td>
+                    <td>
+                        <ul>
+                            <li id="movie-title">{{movie.title}}</li>
+                            <li id="movie-actor">{{movie.actor_name}}</li>
+                            <li id="movie-time">{{movie.movie_time.value}}秒</li>
+                        </ul>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <a href="/movie/">戻る</a>
+</div>
+{% endblock %}

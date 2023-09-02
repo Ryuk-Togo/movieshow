@@ -1,0 +1,92 @@
+{% extends "movie/base.html" %}
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'movie/css/main.css' %}" >
+<script src="{% static 'movie/js/main.js' %}" ></script>
+<script>
+    window.onload = function(){
+        var media = document.getElementById("movie-file");
+        var movieTime = document.getElementById('id_movie_time');
+        console.log(media);
+        media.addEventListener('loadedmetadata', () => {
+            console.log('Yay! The readyState just increased to  ' +
+                'HAVE_CURRENT_DATA or greater for the first time.');
+            movieTime.value = Math.ceil(media.duration);
+        });
+    }
+    $(function() {
+        $('#add-tag-btn').click(function (event){
+            $.ajax({
+            url: "/movie/tag/add/" + $('#add-tag-name').val(),
+            cache: false,
+            type: 'GET',
+            data: {},
+            timeout: 10000,
+            dataType: 'html'
+            }).done(function (data) { //Ajax通信に成功したときの処理
+                $('#add-tag-name').val('');
+                $("#tag_list").html(data);//#ajaxに指定したページを表示
+            }).fail(function (data) { //Ajax通信に失敗したときの処理
+                alert('error');
+            }).always(function (data) { //処理が完了した場合の処理
+                // alert('always');
+            });
+        })
+        $('#scrape').click(function (event){
+            $.ajax({
+            url: "/movie/movieinfo/" + $('#id_file_name').val(),
+            cache: false,
+            type: 'GET',
+            data: {},
+            timeout: 10000,
+            dataType: 'json'
+            }).done(function (data) { //Ajax通信に成功したときの処理
+                console.log(data)
+                $('#id_title').val(data.title);
+                $("#id_actor_name").val(data.actor_name);
+            }).fail(function (data) { //Ajax通信に失敗したときの処理
+                alert('error');
+            }).always(function (data) { //処理が完了した場合の処理
+                // alert('always');
+            });
+        })
+
+        $('#id_return').click(function(event){
+            history.back();
+        });
+    })
+</script>
+
+
+{% endblock %}
+
+{% block body %}
+
+<header>
+    
+</header>
+<div id="content">
+    <div id="edit">
+
+    </div>
+    <div id="movie_list">
+        <form method="POST" form="inputForm" action="{% url 'movie:input' %}" id="inputForm">
+            {% csrf_token %}
+            <video id="movie-file" height="400" controls src="{{movieUrl}}"></video>
+            <button type="button" id="scrape">動画情報　自動取得</button>
+            {{movieForm.as_p}}
+            <div id="tag_list">
+                {{tagList}}
+            </div>
+            <div id="tag_add">
+                <input type="text" id="add-tag-name" value=""/>
+                <!-- <input type="button" id="add-tag-btn" value="タグ追加"/> -->
+                <button type="button" name="add-tag-btn" id="add-tag-btn">タグ追加</button>
+            </div>
+            <button type="submit" name="submit">登録</button>
+            <button type="button" id="id_return" name="return">戻る</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

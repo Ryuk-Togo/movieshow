@@ -1,0 +1,145 @@
+{% extends "movie/base.html" %}
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'movie/css/main.css' %}" >
+<script src="{% static 'movie/js/main.js' %}" ></script>
+<script>
+    var orderNo = 0;
+    var orderNoMax = 0;
+
+    // 順序の設定
+    function setOrderNo(obj) {
+        if (obj.val()=='') {
+            orderNo++;
+            obj.val(orderNo);
+        } else {
+            orderNo--;
+            obj.val('');
+            console.log($('.order-no'));
+        }
+    }
+
+    function getIndex() {
+        var orders = $('.order-no');
+    }
+
+    $(function(){
+        $('.order-no-class').click(function(event){
+            if ($(this).val()=='') {
+                orderNo++;
+                $(this).val(orderNo);
+                $(this).css("background-color","#27acd9")
+                $(this).css("color","#e9e9e9")
+           } else {
+                var selectOrderNo = $(this).val();
+                var selectCnt = 0;
+                //後の番号を１ずつさげる
+                $('.order-no-class').each(function(index) {
+                    if ($(this).val()!=null && $(this).val()!="") {
+                        if (Number($(this).val())>Number(selectOrderNo)) {
+                            $(this).val($(this).val()-1);
+                        }
+                        selectCnt++;
+                    }
+
+
+                });
+                $(this).val('');
+                $(this).css("background-color","#e9e9e9")
+                $(this).css("color","#27acd9")
+                orderNo = selectCnt - 1;
+            }
+        });
+
+        $('.tag-name-class').click(function(event){
+            // $(this).prev().val(!$(this).val());
+            $(this).prev().prop("checked",!$(this).prev().prop("checked"))
+        });
+
+    })
+    
+
+
+</script>
+
+{% endblock %}
+
+{% block body %}
+
+<header>
+    
+</header>
+<div id="content">
+    <div id="edit">
+
+    </div>
+    <form method="GET" form="mainForm" action="" id="mainForm">
+        <div id="search">
+            処理モード：
+            {% for search_mode in mainForm.search_mode.field.choices %}
+                <input type="radio" 
+                    name="{{mainForm.search_mode.name}}"
+                    class="radio-inline__input" 
+                    id="{{mainForm.search_mode.auto_id}}_{{forloop.counter0}}"
+                    value="{{search_mode.0}}"
+                    {% if search_mode.0 %} checked='checked'{% endif %}
+                    />
+                <label class="radio-inline__label" for="{{mainForm.search_mode.auto_id}}_{{forloop.counter0}}">
+                    {{ search_mode.1 }}
+                </label>
+            {% endfor %}
+            <br/>
+            検索文字列：
+            {{mainForm.search_str}}
+                <!-- {% for tag in tagList %}
+                    <div id="tag" class="tag-class">
+                        {{tag.is_select}}
+                        <label for="id_form-{{forloop.counter0}}-is_select" class="tag-label-class">
+                            {{tag.tag_name.value}}
+                        </label>
+                        {{tag.tag_name}}
+                    </div>
+                {% endfor %} -->
+            <div id="tags" class="tags-class">
+                検索条件タグ：
+                <br/>
+                {{tagList}}
+            </div>
+            <button type="submit" name="search" class="submit-button-class">検索</button>
+            <hr/>
+        </div>
+    </form>
+
+    <form method="GET" form="movieForm" action="{% url 'movie:start' %}" id="movieForm">
+        {{ movieList.management_form }}
+        <div id="start">
+            <button id="movie-start" type="submit" name="movie-start">再生</button>
+        </div>
+        <div id="movie_list">
+            {% for movie in movieList %}
+                <table>
+                    <tr>
+                        <td>
+                            <video id="video" height="120" controls src="{{movie.file_path.value}}"></video><br/>
+                        </td>
+                        <td id="movie-data">
+                            <div id="order-no" class="order-no" >
+                                {{movie.order_no}}
+                            </div>
+                            <ul>
+                                <li>{{movie.title}}</li>
+                                <li>{{movie.actor_name}}</li>
+                                {{movie.movie_time}}
+                                {{movie.file_name}}
+                                {{movie.file_path}}
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <a href="{% url 'movie:edit' movie.file_name.value %}">編集</a>
+            <hr/>
+            {% endfor %}
+        </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "movie/base.html" %}
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'movie/css/main.css' %}" >
+<script src="{% static 'movie/js/main.js' %}" ></script>
+
+{% endblock %}
+
+{% block body %}
+
+<header>
+    
+</header>
+<div id="content">
+
+    <video id="video" height="480" controls src="file:///Users/administrator/docker/movieshow/moviefile/take4362.mp4"></video><br/>
+    <input type="file" id="filename" value="ファイル読み込み"/><br/>
+    <input type="button" value="再生" onClick="play()"/>
+    <input type="button" value="停止" onClick="pause()"/><br/>
+    <input type="button" value="速く" onClick="changeSpeed(0.1)"/>
+    <input type="button" value="遅く" onClick="changeSpeed(-0.1)"/><br/>
+    再生位置  :<span id="position">-</span><br/>
+    再生速度  : <span id="speed">1.0</span><br/>
+    ファイル名 :<span id="filename">none</span><br/>
+
+    <script>
+
+    function init(){
+        var f = document.getElementById("filename");
+        f.addEventListener( "change", function (event) {
+            var URL = URL || webkitURL;
+            var file = event.target.files[0];
+            document.querySelector('video').src = URL.createObjectURL(file);
+            // document.querySelector('video').src = URL.createObjectURL('file:///Users/administrator/docker/movieshow/moviefile/take4362.mp4');
+            console.log(URL);
+            console.log(file);
+            document.getElementById('filename').innerHTML = document.querySelector('video').src;
+            console.log(document.querySelector('video').src);
+        }, false );
+
+        var v = document.getElementById("video");
+        v.addEventListener("timeupdate", function(){
+            document.getElementById("position").innerHTML = v.currentTime;
+            document.getElementById("speed").innerHTML = v.playbackRate.toFixed(1);
+        }, false);
+    }
+
+    function play() {
+        var v = document.getElementById("video");
+        if  ( v == null || v.src == null ) return;
+        v.play();
+    }
+
+    function pause() {
+        var v = document.getElementById("video");
+        if  ( v == null || v.src == null ) return;
+        v.pause();
+    }
+
+    function changeSpeed( val ) {
+        var v = document.getElementById("video");
+        if  ( v == null || v.src == null ) return;
+        if ( v.playbackRate + val < 0.1 ) v.playbackRate = 0.1;
+        else v.playbackRate += val;
+    }
+
+    init();
+    </script>
+{% endblock %}

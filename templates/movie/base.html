@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE himl>
+<html>
+    <head lang='ja'>
+    <!-- <meta charset='UTF-8'> -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>
+        動画再生
+    </title>
+    <link rel="stylesheet" href="{% static 'common/css/bootstrap.min.css' %}" >
+    <link rel="stylesheet" href="{% static 'common/css/jquery-ui.css' %}" >
+    <script src="{% static 'common/js/bootstrap.js' %}" ></script>
+    <script src="{% static 'common/js/jquery-3.3.1.js' %}" ></script>
+    <script src="{% static 'common/js/jquery-ui.js' %}" ></script>
+    {% block header %}
+    {% endblock %}
+</head>
+<body>
+    {{message}}
+    {% block body %}
+    {% endblock %}
+</body>
+</html>
